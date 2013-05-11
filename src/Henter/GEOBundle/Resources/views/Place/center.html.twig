@@ -1,0 +1,111 @@
+{% extends "HenterGEOBundle::Place/index.html.twig" %}
+{% block title %}center {{ parent() }}{% endblock %}
+
+{% block intro %}
+    <dl>
+        <dt>搜索圆圈</dt>
+        <dd>
+            <p>
+                以<br />
+                longitude: {{ longitude }} <br />
+                latitude: {{ latitude }} <br />
+                为中心点，<br />
+
+                半径{{ max }}KM<br />
+
+            </p>
+        </dd>
+    </dl>
+{% endblock %}
+
+
+
+
+{% block mapjs %}
+<script type="text/javascript">
+    var map = new BMap.Map("l-map");          // 创建地图实例
+    var point = new BMap.Point({{ longitude }}, {{ latitude }});  // 创建点坐标
+    map.centerAndZoom(point, 13);                 // 初始化地图，设置中心点坐标和地图级别
+    map.enableScrollWheelZoom();
+    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+
+    //current location
+        // 复杂的自定义覆盖物
+        function ComplexCustomOverlay(point, text){
+            this._point = point;
+            this._text = text;
+        }
+        ComplexCustomOverlay.prototype = new BMap.Overlay();
+        ComplexCustomOverlay.prototype.initialize = function(map){
+            this._map = map;
+            var div = this._div = document.createElement("div");
+            div.style.position = "absolute";
+            div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+            div.style.backgroundColor = "#FF00FF";
+            div.style.border = "1px solid #BC3B3A";
+            div.style.color = "white";
+            div.style.height = "18px";
+            div.style.padding = "2px";
+            div.style.lineHeight = "18px";
+            div.style.whiteSpace = "nowrap";
+            div.style.MozUserSelect = "none";
+            div.style.fontSize = "14px"
+            var span = this._span = document.createElement("span");
+            div.appendChild(span);
+            span.appendChild(document.createTextNode(this._text));
+            var that = this;
+
+            var arrow = this._arrow = document.createElement("div");
+            arrow.style.background = "url(http://map.baidu.com/fwmap/upload/r/map/fwmap/static/house/images/label.png) no-repeat";
+            arrow.style.position = "absolute";
+            arrow.style.width = "11px";
+            arrow.style.height = "10px";
+            arrow.style.top = "22px";
+            arrow.style.left = "10px";
+            arrow.style.overflow = "hidden";
+            div.appendChild(arrow);
+
+            map.getPanes().labelPane.appendChild(div);
+            return div;
+        }
+        ComplexCustomOverlay.prototype.draw = function(){
+            var map = this._map;
+            var pixel = map.pointToOverlayPixel(this._point);
+            this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
+            this._div.style.top  = pixel.y - 30 + "px";
+        }
+        var txt = "中心点";
+
+        var myCompOverlay = new ComplexCustomOverlay(point, txt);
+
+        map.addOverlay(myCompOverlay);
+
+    // circle radius, meter
+    var circle = new BMap.Circle(point,{{ max*1000 }});
+    map.addOverlay(circle);
+
+
+    function addCustomLayer(longitude, latitude, title, address){
+        var point = new BMap.Point(longitude, latitude);
+        var marker = new BMap.Marker(point);        // 创建标注
+        map.addOverlay(marker);                     // 将标注添加到地图中
+
+        marker.addEventListener("click", function(){
+
+            var opts = {
+                width : 250,     // 信息窗口宽度
+                height: 100,     // 信息窗口高度
+                title : title  // 信息窗口标题
+            }
+            var infoWindow = new BMap.InfoWindow(address, opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow, map.getCenter());      // 打开信息窗口
+        });
+    }
+
+    {% for p in places %}
+        addCustomLayer({{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}, '{{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}', '{{ p.address }}');
+    {% endfor %}
+
+
+</script>
+{% endblock %}

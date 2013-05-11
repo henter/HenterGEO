@@ -1,0 +1,65 @@
+{% extends "HenterGEOBundle::Place/index.html.twig" %}
+{% block title %}polygon  {{ parent() }}{% endblock %}
+
+{% block intro %}
+    <dl>
+        <dt>搜索多边形</dt>
+        <dd>
+            <p>
+                <br />
+                {% for p in points %}
+                longitude: {{ p.0 }} <br />
+                latitude: {{ p.1 }} <br />
+                <br />
+                {% endfor %}
+
+
+            </p>
+        </dd>
+    </dl>
+{% endblock %}
+
+
+
+
+{% block mapjs %}
+<script type="text/javascript">
+    var map = new BMap.Map("l-map");          // 创建地图实例
+    var point = new BMap.Point({{ center.0 }}, {{ center.1 }});  // 创建点坐标
+    map.centerAndZoom(point, 14);                 // 初始化地图，设置中心点坐标和地图级别
+    map.enableScrollWheelZoom();
+    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+
+
+    var polygon = new BMap.Polygon([
+        {% for p in points %}
+        new BMap.Point({{ p.0 }},{{ p.1 }}),
+        {% endfor %}
+    ], {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5});
+    map.addOverlay(polygon);
+
+
+    function addCustomLayer(longitude, latitude, title, address){
+        var point = new BMap.Point(longitude, latitude);
+        var marker = new BMap.Marker(point);        // 创建标注
+        map.addOverlay(marker);                     // 将标注添加到地图中
+
+        marker.addEventListener("click", function(){
+
+            var opts = {
+                width : 250,     // 信息窗口宽度
+                height: 100,     // 信息窗口高度
+                title : title  // 信息窗口标题
+            }
+            var infoWindow = new BMap.InfoWindow(address, opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow, map.getCenter());      // 打开信息窗口
+        });
+    }
+
+    {% for p in places %}
+        addCustomLayer({{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}, '{{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}', '{{ p.address }}');
+    {% endfor %}
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+services:
+
+    #模板扩展
+    geo.twig.geo_extension:
+        class: Henter\GEOBundle\Twig\GEOExtension
+        tags:
+            - { name: twig.extension }
+        arguments: [@service_container]
