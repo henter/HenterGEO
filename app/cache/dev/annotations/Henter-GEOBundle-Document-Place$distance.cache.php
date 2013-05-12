@@ -1,1 +1,0 @@
-<?php return unserialize('a:1:{i:0;O:49:"Doctrine\\ODM\\MongoDB\\Mapping\\Annotations\\Distance":7:{s:8:"distance";b:1;s:4:"name";N;s:4:"type";s:6:"string";s:8:"nullable";b:0;s:7:"options";a:0:{}s:8:"strategy";N;s:5:"value";N;}}');
