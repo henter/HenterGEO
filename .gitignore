@@ -1,4 +1,3 @@
-app/config/parameters.yml
 web/bundles/
 web/tmp*
 code_check.php
@@ -6,7 +5,6 @@ app/bootstrap*
 app/cache/*
 app/logs/*
 vendor/
-app/config/parameters.yml
 composer.lock
 composer.phar
 web/js/*
