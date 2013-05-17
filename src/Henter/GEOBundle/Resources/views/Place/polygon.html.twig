@@ -39,26 +39,7 @@
     map.addOverlay(polygon);
 
 
-    function addCustomLayer(longitude, latitude, title, address){
-        var point = new BMap.Point(longitude, latitude);
-        var marker = new BMap.Marker(point);        // 创建标注
-        map.addOverlay(marker);                     // 将标注添加到地图中
-
-        marker.addEventListener("click", function(){
-
-            var opts = {
-                width : 250,     // 信息窗口宽度
-                height: 100,     // 信息窗口高度
-                title : title  // 信息窗口标题
-            }
-            var infoWindow = new BMap.InfoWindow(address, opts);  // 创建信息窗口对象
-            map.openInfoWindow(infoWindow, map.getCenter());      // 打开信息窗口
-        });
-    }
-
-    {% for p in places %}
-        addCustomLayer({{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}, '{{ p.coordinate.longitude }}, {{ p.coordinate.latitude }}', '{{ p.address }}');
-    {% endfor %}
+    {% include 'HenterGEOBundle:Place:targets.html.twig' %}
 
 
 </script>

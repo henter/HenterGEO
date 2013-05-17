@@ -6,3 +6,7 @@ services:
         tags:
             - { name: twig.extension }
         arguments: [@service_container]
+
+    #fuck coordinate in China
+    geo.location:
+        class: Henter\GEOBundle\Util\LocationService

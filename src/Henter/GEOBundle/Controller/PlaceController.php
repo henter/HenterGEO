@@ -33,10 +33,12 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function apiAction($type = 'near', $raw = false){
-        $latitude = (float)$this->getRequest()->get('lat');
-        $longitude = (float)$this->getRequest()->get('lon');
-        $max = (float)$this->getRequest()->get('max');
-        $num = (float)$this->getRequest()->get('num');
+        $request = $this->getRequest();
+
+        $latitude = (float)$request->get('lat');
+        $longitude = (float)$request->get('lon');
+        $max = (float)$request->get('max');
+        $num = (float)$request->get('num');
 
         // 2km
         $max = $max ?: 2/111;
@@ -54,8 +56,8 @@ class PlaceController extends BaseController
                 ->getQuery();
 
         }elseif($type == 'box'){
-            $latitude2 = (float)$this->getRequest()->get('lat2');
-            $longitude2 = (float)$this->getRequest()->get('lon2');
+            $latitude2 = (float)$request->get('lat2');
+            $longitude2 = (float)$request->get('lon2');
 
             $places = $repo->createQueryBuilder()
                 ->field('coordinate')->withinBox($longitude, $latitude, $longitude2, $latitude2)
@@ -81,11 +83,12 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function nearAction(){
+        $request = $this->getRequest();
 
-        $longitude = (float)$this->getRequest()->get('lon',121.4905);
-        $latitude = (float)$this->getRequest()->get('lat',31.2646);
+        $longitude = (float)$request->get('lon',121.4905);
+        $latitude = (float)$request->get('lat',31.2646);
         //2km
-        $max = (float)$this->getRequest()->get('max', 2);
+        $max = (float)$request->get('max', 2);
 
         $places = $this->getPlaceRepository()->createQueryBuilder()
             ->field('coordinate')->near($longitude, $latitude)
@@ -101,11 +104,12 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function centerAction(){
+        $request = $this->getRequest();
 
-        $longitude = (float)$this->getRequest()->get('lon',121.4905);
-        $latitude = (float)$this->getRequest()->get('lat',31.2646);
+        $longitude = (float)$request->get('lon',121.4905);
+        $latitude = (float)$request->get('lat',31.2646);
         //10km
-        $max = (float)$this->getRequest()->get('max', 10);
+        $max = (float)$request->get('max', 10);
 
         $places = $this->getPlaceRepository()->createQueryBuilder()
             ->field('coordinate')->withinCenter($longitude, $latitude, $max/111)
@@ -120,20 +124,19 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function boxAction(){
+        $request = $this->getRequest();
 
-        $longitude = (float)$this->getRequest()->get('lon',121.44);
-        $latitude = (float)$this->getRequest()->get('lat',31.25);
+        $longitude = (float)$request->get('lon',121.462035);
+        $latitude = (float)$request->get('lat',31.237641);
 
-        $longitude2 = (float)$this->getRequest()->get('lon2',121.5005);
-        $latitude2 = (float)$this->getRequest()->get('lat2',31.2846);
-        //2km
-        $max = (float)$this->getRequest()->get('max', 2);
+        $longitude2 = (float)$request->get('lon2',121.522098);
+        $latitude2 = (float)$request->get('lat2',31.215284);
 
         $places = $this->getPlaceRepository()->createQueryBuilder()
             ->field('coordinate')->withinBox($longitude, $latitude, $longitude2, $latitude2)
             ->getQuery()->toarray();
 
-        return compact('places','max','longitude','latitude', 'longitude2', 'latitude2');
+        return compact('places','longitude','latitude', 'longitude2', 'latitude2');
     }
 
 
@@ -169,11 +172,12 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function geonearAction(){
+        $request = $this->getRequest();
 
-        $longitude = (float)$this->getRequest()->get('lon',121.4905);
-        $latitude = (float)$this->getRequest()->get('lat',31.2646);
+        $longitude = (float)$request->get('lon',121.4905);
+        $latitude = (float)$request->get('lat',31.2646);
         //2km
-        $max = (float)$this->getRequest()->get('max', 2);
+        $max = (float)$request->get('max', 2);
 
         $places = $this->getPlaceRepository()->createQueryBuilder()
             ->field('coordinate')->geoNear($longitude, $latitude)
@@ -191,11 +195,12 @@ class PlaceController extends BaseController
      * @Template()
      */
     public function distanceAction(){
+        $request = $this->getRequest();
 
-        $longitude = (float)$this->getRequest()->get('lon',121.4905);
-        $latitude = (float)$this->getRequest()->get('lat',31.2646);
+        $longitude = (float)$request->get('lon',121.4905);
+        $latitude = (float)$request->get('lat',31.2646);
         //2km
-        $max = (float)$this->getRequest()->get('max', 2);
+        $max = (float)$request->get('max', 2);
 
         $places = $this->getPlaceRepository()->createQueryBuilder()
             ->field('coordinate')
@@ -210,5 +215,28 @@ class PlaceController extends BaseController
         ;
 
         return compact('places','longitude', 'latitude', 'max');
+    }
+
+
+
+    /**
+     * @Route("/geointersect", name="geointersect")
+     * @Template()
+     */
+    public function geointersectAction(){
+        //doctrine do not support geointersect yet, coordinates below are just for demo
+        $points = [];
+        $points[] = [121.45183,31.243816];
+        $points[] = [121.533181,31.24344];
+        $points[] = [121.535049,31.208983];
+        $points[] = [121.45183,31.243816];
+
+
+        $places = include dirname(__DIR__).'/Command/geointersects.php';
+
+
+        $longitude = '121.4905';
+        $latitude = '31.2646';
+        return compact('places','points','longitude', 'latitude');
     }
 }
