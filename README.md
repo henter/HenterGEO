@@ -8,6 +8,6 @@ Install
 $ git clone https://github.com/henter/HenterGEO.git
 $ cd HenterGEO/
 $ composer update
-$ php app/console doctrine:mongodb:schmea:update
+$ php app/console doctrine:mongodb:schema:update
 $ php app/console geo:data:import
 ```
